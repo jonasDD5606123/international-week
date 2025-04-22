@@ -4,7 +4,8 @@ from database import (
     get_available_drones_per_location,
     create_reservering,
     create_verslag,
-    get_reserveringen_voor_gebruiker
+    get_reserveringen_voor_gebruiker,
+    update_drone_status
 )
 
 routes_bp = Blueprint('routes', __name__)
@@ -29,6 +30,9 @@ def reserveer():
 
         # Maak de reservering
         create_reservering(current_user.id, drone_id, startplaats_id)
+
+        # Update de status van de drone naar gereserveerd
+        update_drone_status(drone_id, current_user.id)
 
         # Redirect naar de homepagina
         return redirect(url_for('routes.index'))

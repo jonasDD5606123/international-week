@@ -13,11 +13,11 @@ locations = [
 
 # Drones gelinkt aan locaties
 drones = [
-    {"id": 1, "batterijlevel": 100, "isbeschikbaar": True, "location_id": 1},
-    {"id": 2, "batterijlevel": 85, "isbeschikbaar": True, "location_id": 2},
-    {"id": 3, "batterijlevel": 10, "isbeschikbaar": False, "location_id": 1},
-    {"id": 4, "batterijlevel": 60, "isbeschikbaar": True, "location_id": 1},
-    {"id": 5, "batterijlevel": 60, "isbeschikbaar": True, "location_id": 2},
+    {"id": 1, "batterijlevel": 100, "isbeschikbaar": True, "location_id": 1, "reserved_by": None},
+    {"id": 2, "batterijlevel": 85, "isbeschikbaar": True, "location_id": 2, "reserved_by": None},
+    {"id": 3, "batterijlevel": 10, "isbeschikbaar": False, "location_id": 1, "reserved_by": None},
+    {"id": 4, "batterijlevel": 60, "isbeschikbaar": True, "location_id": 1, "reserved_by": None},
+    {"id": 5, "batterijlevel": 60, "isbeschikbaar": True, "location_id": 2, "reserved_by": None},
 ]
 
 reserveringen = []
@@ -25,28 +25,10 @@ verslagen = []
 
 
 # Database functies
+
 def get_user_by_id(user_id):
     for user in users:
         if user['id'] == int(user_id):
-            return User(user['id'], user['naam'], user['rol'])
-    return None
-
-# database.py
-def get_all_drones():
-    # Voorbeeld van hoe je de drones kunt ophalen
-    # Hier kun je bijvoorbeeld een databasequery doen om alle drones op te halen
-    drones = [
-        # Lijst van drones (vervang dit met echte data uit je database)
-        {"id": 1, "locatie": "Locatie A", "isbeschikbaar": True, "batterijlevel": 50},
-        {"id": 2, "locatie": "Locatie B", "isbeschikbaar": False, "batterijlevel": 20},
-        # Voeg meer drones toe
-    ]
-    return drones
-
-
-def get_user_by_name(naam):
-    for user in users:
-        if user['naam'] == naam:
             return User(user['id'], user['naam'], user['rol'])
     return None
 
@@ -67,16 +49,11 @@ def get_available_drones_per_location():
         })
     return result
 
-
-
-# Extra functie om platte lijst van beschikbare drones op te halen (optioneel)
-def get_beschikbare_drones():
-    return [d for d in drones if d['isbeschikbaar']]
-
-
-def get_beschikbare_locaties():
-    # Alleen locaties met minstens één beschikbare drone
-    return [loc for loc in get_available_drones_per_location() if loc["beschikbare_drones"]]
+def get_user_by_name(naam):
+    for user in users:
+        if user['naam'] == naam:
+            return User(user['id'], user['naam'], user['rol'])
+    return None
 
 
 def create_reservering(user_id, drone_id, startplaats_id):
@@ -93,8 +70,20 @@ def create_reservering(user_id, drone_id, startplaats_id):
     for drone in drones:
         if drone['id'] == drone_id:
             drone['isbeschikbaar'] = False
+            drone['gereserveerd_voor'] = user_id  # Nieuwe key om de gebruiker bij de drone op te slaan
 
     return reservering
+
+
+
+def update_drone_status(drone_id, reserved_by):
+    # Update de status van de drone naar gereserveerd
+    for drone in drones:
+        if drone['id'] == drone_id:
+            drone['isbeschikbaar'] = False  # Maak de drone onbeschikbaar
+            drone['reserved_by'] = reserved_by  # Koppel de drone aan de gebruiker (piloot)
+            return drone
+    return None
 
 
 def create_verslag(status, locatie, user_id, reservering_id, beeldmateriaal, timestamp):
@@ -120,6 +109,7 @@ def create_verslag(status, locatie, user_id, reservering_id, beeldmateriaal, tim
                     drone['isbeschikbaar'] = True
 
     return verslag
+
 
 def get_reserveringen_voor_gebruiker(user_id):
     return [r for r in reserveringen if r['user_id'] == user_id]

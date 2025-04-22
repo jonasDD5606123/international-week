@@ -341,3 +341,11 @@ button.secondary:hover, .button.secondary:hover {
     50% { transform: translateY(-60%) translateX(-10px); }
     100% { transform: translateY(-50%) translateX(0); }
 }
+
+.reserved {
+    background-color: #f0f0f0;
+    border: 2px solid #aaa;
+}
+.reserved-status {
+    color: #ff6347;  /* Bijvoorbeeld een oranje kleur voor gereserveerde status */
+}

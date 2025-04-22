@@ -6,7 +6,33 @@
         <a href="{{ url_for('routes.reserveer') }}" class="button">Nieuwe Reservatie</a>
         <a href="{{ url_for('routes.verslag') }}" class="button secondary">Verslag Indienen</a>
     </div>
+<section class="reserved-drones-section">
+        <h2>Gereseveerde Drones</h2>
+        <div class="drone-grid">
+            {% for location in locations %}
+                {% for drone in location.drones %}
+                    {% if drone.gereserveerd_voor == current_user.id %}
+                    <div class="drone-card reserved">
+                        <div class="drone-header">
+                            <h3>Drone #{{ drone.id }}</h3>
+                            <span class="drone-id">Locatie: {{ location.naam }}</span>
+                        </div>
 
+                        <div class="battery-level {% if drone.batterijlevel > 70 %}battery-high{% elif drone.batterijlevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                            <div class="battery-fill" style="width: {{ drone.batterijlevel }}%"></div>
+                        </div>
+
+                        <div>Batterij: {{ drone.batterijlevel }}%</div>
+
+                        <span class="status reserved-status">
+                            Gereserveerd
+                        </span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </section>
     {% for location in locations %}
     <section class="location-section">
         <h2>{{ location.naam }}
@@ -15,28 +41,24 @@
 
         <div class="drone-grid">
             {% for drone in location.drones %}
-            <div class="drone-card {% if not drone.isbeschikbaar %}unavailable{% endif %}"
-                 data-drone-id="{{ drone.id }}"
-                 data-location-id="{{ location.id }}"
-                 {% if drone.isbeschikbaar %}
-                 onclick="window.location.href='{{ url_for('routes.reserveer', location_id=location.id, drone_id=drone.id) }}'"
-                 {% else %}
-                 onclick="window.location.href='{{ url_for('routes.verslag', reservering_id=drone.reservering_id) }}'" {% endif %}>
-                <div class="drone-header">
-                    <h3>Drone #{{ drone.id }}</h3>
-                    <span class="drone-id">Locatie: {{ location.naam }}</span>
+                {% if drone.isbeschikbaar %}
+                <div class="drone-card" onclick="window.location.href='{{ url_for('routes.reserveer', location_id=location.id, drone_id=drone.id) }}'">
+                    <div class="drone-header">
+                        <h3>Drone #{{ drone.id }}</h3>
+                        <span class="drone-id">Locatie: {{ location.naam }}</span>
+                    </div>
+
+                    <div class="battery-level {% if drone.batterijlevel > 70 %}battery-high{% elif drone.batterijlevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                        <div class="battery-fill" style="width: {{ drone.batterijlevel }}%"></div>
+                    </div>
+
+                    <div>Batterij: {{ drone.batterijlevel }}%</div>
+
+                    <span class="status {% if drone.isbeschikbaar %}status-available{% else %}status-unavailable{% endif %}">
+                        {% if drone.isbeschikbaar %}Beschikbaar{% else %}In gebruik{% endif %}
+                    </span>
                 </div>
-
-                <div class="battery-level {% if drone.batterijlevel > 70 %}battery-high{% elif drone.batterijlevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
-                    <div class="battery-fill" style="width: {{ drone.batterijlevel }}%"></div>
-                </div>
-
-                <div>Batterij: {{ drone.batterijlevel }}%</div>
-
-                <span class="status {% if drone.isbeschikbaar %}status-available{% else %}status-unavailable{% endif %}">
-                    {% if drone.isbeschikbaar %}Beschikbaar{% else %}In gebruik{% endif %}
-                </span>
-            </div>
+                {% endif %}
             {% endfor %}
         </div>
     </section>
