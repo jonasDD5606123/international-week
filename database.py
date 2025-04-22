@@ -15,7 +15,9 @@ locations = [
 drones = [
     {"id": 1, "batterijlevel": 100, "isbeschikbaar": True, "location_id": 1},
     {"id": 2, "batterijlevel": 85, "isbeschikbaar": True, "location_id": 2},
-    {"id": 3, "batterijlevel": 60, "isbeschikbaar": False, "location_id": 1}
+    {"id": 3, "batterijlevel": 10, "isbeschikbaar": False, "location_id": 1},
+    {"id": 4, "batterijlevel": 60, "isbeschikbaar": True, "location_id": 1},
+    {"id": 5, "batterijlevel": 60, "isbeschikbaar": True, "location_id": 2},
 ]
 
 reserveringen = []
@@ -28,6 +30,18 @@ def get_user_by_id(user_id):
         if user['id'] == int(user_id):
             return User(user['id'], user['naam'], user['rol'])
     return None
+
+# database.py
+def get_all_drones():
+    # Voorbeeld van hoe je de drones kunt ophalen
+    # Hier kun je bijvoorbeeld een databasequery doen om alle drones op te halen
+    drones = [
+        # Lijst van drones (vervang dit met echte data uit je database)
+        {"id": 1, "locatie": "Locatie A", "isbeschikbaar": True, "batterijlevel": 50},
+        {"id": 2, "locatie": "Locatie B", "isbeschikbaar": False, "batterijlevel": 20},
+        # Voeg meer drones toe
+    ]
+    return drones
 
 
 def get_user_by_name(naam):
@@ -48,10 +62,11 @@ def get_available_drones_per_location():
             "id": location["id"],
             "naam": location["naam"],
             "drones": loc_drones,
-            "beschikbare_drones": available_drones,
+            "beschikbare_drones": available_drones,  # Voeg alleen de beschikbare drones toe
             "max_drones": location["max_drones"]
         })
     return result
+
 
 
 # Extra functie om platte lijst van beschikbare drones op te halen (optioneel)

@@ -1,61 +1,52 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 from database import (
-    get_beschikbare_drones,
-    get_beschikbare_locaties,
+    get_available_drones_per_location,
     create_reservering,
     create_verslag,
-    get_reserveringen_voor_gebruiker,
-    get_available_drones_per_location
+    get_reserveringen_voor_gebruiker
 )
-from datetime import datetime
 
 routes_bp = Blueprint('routes', __name__)
 
-
+# Homepagina die de beschikbare drones toont
 @routes_bp.route('/')
 @login_required
 def index():
-    # Verkrijg de actieve reservatie van de gebruiker (indien aanwezig)
-    user_reserveringen = get_reserveringen_voor_gebruiker(current_user.id)
-    actieve_reservatie = next((r for r in user_reserveringen if r['verslag_id'] is None), None)
-    actieve_drone = None
-
-    if actieve_reservatie:
-        # Vind de actieve drone op basis van de reservering
-        actieve_drone = next((d for d in get_beschikbare_drones() + [dr for dr in drones if not dr['isbeschikbaar']]
-                              if d['id'] == actieve_reservatie['drones_id']), None)
-
-    return render_template('index.html',
-                           locations=get_available_drones_per_location(),
-                           actieve_drone=actieve_drone)
+    # Verkrijg de locaties en drones die beschikbaar zijn per locatie
+    available_locations = get_available_drones_per_location()
+    return render_template('index.html', locations=available_locations)
 
 
+# Reserveren van een drone
 @routes_bp.route('/reserveer', methods=['GET', 'POST'])
 @login_required
 def reserveer():
-    # Controleer of de gebruiker al een actieve reservatie heeft
-    user_reserveringen = get_reserveringen_voor_gebruiker(current_user.id)
-    actieve_reservatie = next((r for r in user_reserveringen if r['verslag_id'] is None), None)
-
     if request.method == 'POST':
-        if actieve_reservatie:
-            # Laat weten dat je maar één actieve reservatie kunt hebben
-            return "Je hebt al een actieve reservatie. Dien eerst een verslag in."
+        location_id = int(request.form['location_id'])  # De locatie die geselecteerd is
+        drone_id = int(request.form['drone_id'])  # De drone die geselecteerd is
+        startplaats_id = location_id  # De locatie wordt ook de startplaats
 
-        drone_id = int(request.form['drone_id'])
-        startplaats_id = int(request.form['startplaats_id'])
-
-        # Maak een nieuwe reservatie aan
+        # Maak de reservering
         create_reservering(current_user.id, drone_id, startplaats_id)
+
+        # Redirect naar de homepagina
         return redirect(url_for('routes.index'))
 
-    return render_template('reserveer.html',
-                           drones=get_beschikbare_drones(),
-                           startplaatsen=get_beschikbare_locaties(),
-                           actieve_reservatie=actieve_reservatie)
+    # Verkrijg de locatie en drone op basis van de URL-parameters
+    location_id = request.args.get('location_id', type=int)
+    drone_id = request.args.get('drone_id', type=int)
+
+    available_locations = get_available_drones_per_location()
+
+    # Zoek de specifieke locatie en drone
+    selected_location = next((loc for loc in available_locations if loc['id'] == location_id), None)
+    selected_drone = next((drone for loc in available_locations for drone in loc['drones'] if drone['id'] == drone_id), None)
+
+    return render_template('reserveer.html', locations=available_locations, selected_location=selected_location, selected_drone=selected_drone)
 
 
+# Verslag indienen
 @routes_bp.route('/verslag', methods=['GET', 'POST'])
 @login_required
 def verslag():
@@ -65,14 +56,10 @@ def verslag():
         locatie = request.form['locatie']
         beeldmateriaal = request.form.get('beeldmateriaal', '')
 
-        # Voeg het verslag toe met huidige tijd
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        create_verslag(status, locatie, current_user.id, reservering_id, beeldmateriaal, timestamp)
+        # Maak verslag aan
+        create_verslag(status, locatie, current_user.id, reservering_id, beeldmateriaal, "2023-01-01 12:00:00")
         return redirect(url_for('routes.index'))
 
-    # Verkrijg reserveringen voor de ingelogde gebruiker
+    # Haal reserveringen op voor de huidige gebruiker
     user_reserveringen = get_reserveringen_voor_gebruiker(current_user.id)
     return render_template('verslag.html', reserveringen=user_reserveringen)
-
-

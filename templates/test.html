@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Drone reserveren</h1>
+    <form method="POST">
+        <h2>Selecteer een locatie:</h2>
+        <select name="location_id" id="location-select" required>
+            <option value="" disabled {% if not selected_location %}selected{% endif %}>Kies een locatie</option>
+            {% for location in locations %}
+                <option value="{{ location.id }}" {% if location.id == selected_location.id %}selected{% endif %}>{{ location.naam }}</option>
+            {% endfor %}
+        </select>
+
+        <div id="drone-selection">
+            <h3>Beschikbare drone:</h3>
+            {% if selected_drone %}
+                <p>Drone #{{ selected_drone.id }} (Batterij: {{ selected_drone.batterijlevel }}%)</p>
+                <input type="hidden" name="drone_id" value="{{ selected_drone.id }}">
+            {% else %}
+                <!-- Dynamisch de drones tonen op basis van de geselecteerde locatie -->
+                <p>Selecteer een locatie om drones weer te geven.</p>
+            {% endif %}
+        </div>
+
+        <button type="submit">Reserveer</button>
+    </form>
+
+{% endblock %}

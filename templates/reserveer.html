@@ -3,23 +3,50 @@
 {% block content %}
     <h1>Drone reserveren</h1>
     <form method="POST">
-        <h2>Selecteer een drone:</h2>
-        <select name="drone_id" required>
-            {% for drone in drones %}
-                <option value="{{ drone.id }}">
-                    Drone {{ drone.id }} ({{ drone.batterijlevel }}%)
-                </option>
+        <h2>Selecteer een locatie:</h2>
+        <select name="location_id" id="location-select" required>
+            <option value="" disabled {% if not selected_location %}selected{% endif %}>Kies een locatie</option>
+            {% for location in locations %}
+                <option value="{{ location.id }}" {% if location.id == selected_location.id %}selected{% endif %}>{{ location.naam }}</option>
             {% endfor %}
         </select>
 
-        <h2>Selecteer een startplaats:</h2>
-        <select name="startplaats_id" required>
-            {% for plaats in startplaatsen %}
-                <option value="{{ plaats.id }}">{{ plaats.naam }}</option>
-            {% endfor %}
-        </select>
+        <div id="drone-selection">
+            <h3>Beschikbare drone:</h3>
+            {% if selected_drone %}
+                <p>Drone #{{ selected_drone.id }} (Batterij: {{ selected_drone.batterijlevel }}%)</p>
+                <input type="hidden" name="drone_id" value="{{ selected_drone.id }}">
+            {% else %}
+                <!-- Dynamisch de drones tonen op basis van de geselecteerde locatie -->
+                <p>Selecteer een locatie om drones weer te geven.</p>
+            {% endif %}
+        </div>
 
-        <br><br>
         <button type="submit">Reserveer</button>
     </form>
+<script>
+        // Dynamisch de drones tonen op basis van de geselecteerde locatie
+        document.getElementById('location-select').addEventListener('change', function() {
+            var locationId = this.value;
+            var dronesContainer = document.getElementById('drone-selection');
+            dronesContainer.innerHTML = '';  // Reset de drones sectie
+
+            // Zoek de drones die overeenkomen met de geselecteerde locatie
+            var location = {{ locations|tojson }};
+            var dronesForLocation = location.find(loc => loc.id == locationId).beschikbare_drones;
+
+            if (dronesForLocation.length > 0) {
+                dronesForLocation.forEach(function(drone) {
+                    var droneElement = document.createElement('div');
+                    droneElement.innerHTML = `
+                        <input type="radio" name="drone_id" value="${drone.id}" required>
+                        <label>Drone #${drone.id} (Batterij: ${drone.batterijlevel}%)</label><br>
+                    `;
+                    dronesContainer.appendChild(droneElement);
+                });
+            } else {
+                dronesContainer.innerHTML = 'Geen drones beschikbaar voor deze locatie.';
+            }
+        });
+    </script>
 {% endblock %}

@@ -2,13 +2,10 @@
 
 {% block content %}
     <h1>Drone Reservatie Systeem</h1>
-{% if actieve_drone %}
-    <div class="actieve-drone-box">
-        <h3>Actieve Drone</h3>
-        <p>Drone #{{ actieve_drone.id }} op jouw naam (Batterij: {{ actieve_drone.batterijlevel }}%)</p>
+    <div class="button-group">
+        <a href="{{ url_for('routes.reserveer') }}" class="button">Nieuwe Reservatie</a>
+        <a href="{{ url_for('routes.verslag') }}" class="button secondary">Verslag Indienen</a>
     </div>
-{% endif %}
-
 
     {% for location in locations %}
     <section class="location-section">
@@ -20,7 +17,11 @@
             {% for drone in location.drones %}
             <div class="drone-card {% if not drone.isbeschikbaar %}unavailable{% endif %}"
                  data-drone-id="{{ drone.id }}"
-                 data-location-id="{{ location.id }}">
+                 data-location-id="{{ location.id }}"
+                 {% if drone.isbeschikbaar %}
+                 onclick="window.location.href='{{ url_for('routes.reserveer', location_id=location.id, drone_id=drone.id) }}'"
+                 {% else %}
+                 onclick="window.location.href='{{ url_for('routes.verslag', reservering_id=drone.reservering_id) }}'" {% endif %}>
                 <div class="drone-header">
                     <h3>Drone #{{ drone.id }}</h3>
                     <span class="drone-id">Locatie: {{ location.naam }}</span>
@@ -41,8 +42,5 @@
     </section>
     {% endfor %}
 
-    <div class="button-group">
-        <a href="{{ url_for('routes.reserveer') }}" class="button">Nieuwe Reservatie</a>
-        <a href="{{ url_for('routes.verslag') }}" class="button secondary">Verslag Indienen</a>
-    </div>
+
 {% endblock %}
