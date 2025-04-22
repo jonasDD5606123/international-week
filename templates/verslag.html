@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Vluchtverslag indienen</h1>
+    <form method="POST">
+        <label for="reservering_id">Reservering:</label>
+        <select name="reservering_id" required>
+            {% for res in reserveringen %}
+                <option value="{{ res.id }}">Reservering {{ res.id }}</option>
+            {% endfor %}
+        </select><br>
+        
+        <label for="status">Status:</label>
+        <input name="status" required><br>
+        
+        <label for="locatie">Locatie:</label>
+        <input name="locatie"><br>
+        
+        <label for="beeldmateriaal">Beeldmateriaal URL:</label>
+        <input name="beeldmateriaal"><br>
+        
+        <button type="submit">Indienen</button>
+    </form>
+{% endblock %}

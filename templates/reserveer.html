@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Drone reserveren</h1>
+    <form method="POST">
+        <h2>Selecteer een drone:</h2>
+        <select name="drone_id" required>
+            {% for drone in drones %}
+                <option value="{{ drone.id }}">
+                    Drone {{ drone.id }} ({{ drone.batterijlevel }}%)
+                </option>
+            {% endfor %}
+        </select>
+
+        <h2>Selecteer een startplaats:</h2>
+        <select name="startplaats_id" required>
+            {% for plaats in startplaatsen %}
+                <option value="{{ plaats.id }}">{{ plaats.naam }}</option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+        <button type="submit">Reserveer</button>
+    </form>
+{% endblock %}

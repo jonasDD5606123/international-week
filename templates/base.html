@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CityMesh Drone App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        {% if current_user.is_authenticated %}
+            <p>Ingelogd als {{ current_user.naam }} ({{ current_user.rol }}) | <a href="{{ url_for('auth.logout') }}">Uitloggen</a></p>
+        {% endif %}
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        // Drone selectie functionaliteit
+        document.addEventListener('DOMContentLoaded', function() {
+            const droneCards = document.querySelectorAll('.drone-card:not(.unavailable)');
+
+            droneCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Max 3 drones selecteren per locatie
+                    const locationId = this.dataset.locationId;
+                    const selectedInLocation = document.querySelectorAll(`.drone-card.selected[data-location-id="${locationId}"]`);
+
+                    if (this.classList.contains('selected')) {
+                        this.classList.remove('selected');
+                    } else if (selectedInLocation.length < 3) {
+                        this.classList.add('selected');
+                    } else {
+                        alert('Maximum 3 drones kunnen per locatie geselecteerd worden');
+                    }
+                });
+            });
+
+            // Flight animation voor drones in gebruik
+            const unavailableDrones = document.querySelectorAll('.drone-card.unavailable');
+            unavailableDrones.forEach(drone => {
+                drone.classList.add('drone-in-flight');
+            });
+        });
+    </script>
+</body>
+</html>
