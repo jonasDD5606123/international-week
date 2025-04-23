@@ -1,4 +1,5 @@
-python -m venv .venv
-.venv\Scripts\activate
-pip install flask
-pip install flask_login
+
+1) python -m venv .venv
+2) .venv\Scripts\activate
+3) pip install flask
+4) pip install flask_login
