@@ -1,5 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from flask_login import login_required, current_user
+from model.drone import Drone
+from model.user import User
 
 from database import (
     get_available_drones_per_location,
@@ -68,3 +70,38 @@ def verslag():
     # Haal reserveringen op voor de huidige gebruiker
     user_reserveringen = get_reserveringen_voor_gebruiker(current_user.id)
     return render_template('verslag.html', reserveringen=user_reserveringen)
+
+
+@routes_bp.route("/drone", methods=['POST'])
+def postDrone():
+    data = request.get_json()
+    beschikbaarheid = data["beschikbaarheid"]
+    batterijLevel = data["batterijLevel"]
+    locatieId = data["locatieId"]
+
+    if beschikbaarheid is None:
+        return jsonify({'error': 'beschikbaarheid parameter is missing'}), 400
+    elif batterijLevel is None:
+        return jsonify({'error': 'batterijLevel parameter is missing'}), 400
+    elif locatieId is None:
+        return jsonify({'error': 'locatieId parameter is missing', 'status': 400}), 400
+
+    from database_context import DatabaseContext
+    #Try catch
+    drone = Drone(beschikbaarheid=beschikbaarheid, batterijLevel=batterijLevel, locatieId=locatieId)
+    drone.create()
+    return jsonify({'msg': 'drone created.', 'status': 201}), 201
+
+# piloot = 1 verslaggever = 2
+@routes_bp.route('/user', methods=['POST'])
+def postUser():
+    data = request.get_json()
+    naam = data['naam']
+    rol = data['rol']
+    if naam is None:
+        return 'failed naam missing'
+    elif rol is None:
+        return 'failed rol is missing'
+    user = User(naam=naam, rol=rol)
+    user.create()
+    return jsonify({'msg': 'user created', 'status': 201}), 201

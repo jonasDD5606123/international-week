@@ -1,12 +1,23 @@
 import sqlite3
 
 def initialize_database():
-    conn = sqlite3.connect('../database.db')  # Zorg dat dit pad klopt
+    conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
 
-    cursor.executescript("""
-    PRAGMA foreign_keys = ON;
+    # Zet foreign key enforcement aan
+    cursor.execute("PRAGMA foreign_keys = ON;")
 
+    # Verwijder bestaande tabellen
+    cursor.executescript("""
+    DROP TABLE IF EXISTS Verslagen;
+    DROP TABLE IF EXISTS Reserveringen;
+    DROP TABLE IF EXISTS Drones;
+    DROP TABLE IF EXISTS Startplaats;
+    DROP TABLE IF EXISTS Users;
+    """)
+
+    # Maak tabellen opnieuw aan
+    cursor.executescript("""
     CREATE TABLE IF NOT EXISTS Users (
         ID INTEGER PRIMARY KEY,
         Naam TEXT NOT NULL,
@@ -49,6 +60,12 @@ def initialize_database():
         FOREIGN KEY (reservering_id) REFERENCES Reserveringen(ID)
     );
     """)
+
+    # Voeg testdata toe
+    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Admin", "admin"))
+    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 1", "piloot"))
+    cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie A", 3))
+    cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie B", 3))
 
     conn.commit()
     conn.close()
