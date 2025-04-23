@@ -35,11 +35,13 @@ def get_available_drones_per_location():
         for loc in locaties:
             all_drones = conn.execute("SELECT * FROM Drones WHERE locatieId = ?", (loc['ID'],)).fetchall()
             available = [d for d in all_drones if d['Isbeschikbaar'] == 1]
+            reserved = [d for d in all_drones if d['Isbeschikbaar'] == 2]
             result.append({
                 "id": loc['ID'],
                 "naam": loc['naam'],
                 "drones": [dict(d) for d in all_drones],
                 "beschikbare_drones": [dict(d) for d in available],
+                "gereserveerde_drones": [dict(d) for d in reserved],
                 "max_drones": loc['maxDrones']
             })
         return result
@@ -72,12 +74,12 @@ def get_reserveringen_voor_gebruiker(user_id):
     with get_connection() as conn:
         cur = conn.execute("SELECT * FROM Reserveringen WHERE user_id = ?", (user_id,))
         return [dict(row) for row in cur.fetchall()]
-def update_drone_status(drone_id, new_status):
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute('UPDATE Drones SET Isbeschikbaar = ? WHERE ID = ?', (new_status, drone_id))
-    conn.commit()
-    conn.close()
+
+def update_drone_status(drone_id, user_id):
+    with get_connection() as conn:
+        conn.execute("UPDATE Drones SET Isbeschikbaar = 2, gereserveerd_voor = ? WHERE ID = ?",
+                    (user_id, drone_id))
+        conn.commit()
 
 
 import sqlite3

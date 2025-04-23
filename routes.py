@@ -105,3 +105,21 @@ def postUser():
     user = User(naam=naam, rol=rol)
     user.create()
     return jsonify({'msg': 'user created', 'status': 201}), 201
+
+#a partir dici
+from model.locatie import Locatie
+@routes_bp.route('/locatie', methods=['POST'])
+def postLocaties():
+    data = request.get_json()
+    naam = data["naam"]
+    maxDrones = data["maxDrones"]
+
+    if naam is None:
+        return 'failed naam is missing'
+    elif maxDrones is None:
+        return 'failed maxDrones is missing'
+
+    locatie = Locatie(naam=naam, maxDrones=maxDrones)
+    locatie.create()
+
+    return jsonify({'msg': 'location created', 'status': 201}), 201
