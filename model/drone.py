@@ -1,4 +1,3 @@
-#project/model/drone.py
 from database_context import DatabaseContext
 
 class Drone:

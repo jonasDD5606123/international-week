@@ -1,24 +1,15 @@
+from flask_login import UserMixin
 from database_context import DatabaseContext
 
-
-class User():
-    def __init__(self, naam, rol, id=None):
+class User(UserMixin):
+    def __init__(self, id, naam, rol):
         self.id = id
         self.naam = naam
         self.rol = rol
 
-    @staticmethod
-    def login(naam):
-        sql = 'SELECT * FROM Users WHERE Naam = ?'
-        dc = DatabaseContext()
-        conn = dc.getDbConn()
-        cursor = conn.cursor()
-        cursor.execute(sql, (naam,))
-        row = cursor.fetchone()
-        conn.close()
-        if row:
-            return True
-        return False
+    def get_id(self):
+        return str(self.id)
+
 
     def create(self):
         # Parameterized query to avoid SQL injection
