@@ -3,7 +3,7 @@
 import sqlite3
 
 class DatabaseContext:
-    def init(self):
+    def __init__(self):
         self._conn = sqlite3.connect('database.db')
 
     def getDbConn(self):

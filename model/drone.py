@@ -1,7 +1,7 @@
 from database_context import DatabaseContext
 
 class Drone:
-    def init(self, beschikbaarheid, batterijLevel, locatieId, id = None):
+    def __init__(self, beschikbaarheid, batterijLevel, locatieId, id = None):
         self.id = id
         self.beschikbaarheid = beschikbaarheid
         self.batterijLevel = batterijLevel

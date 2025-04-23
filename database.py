@@ -78,3 +78,20 @@ def update_drone_status(drone_id, new_status):
     cursor.execute('UPDATE Drones SET Isbeschikbaar = ? WHERE ID = ?', (new_status, drone_id))
     conn.commit()
     conn.close()
+
+
+import sqlite3
+
+def add_user(naam, rol):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", (naam, rol))
+    conn.commit()
+    conn.close()
+
+def add_startplaats(naam, max_drones):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", (naam, max_drones))
+    conn.commit()
+    conn.close()
