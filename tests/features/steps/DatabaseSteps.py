@@ -1,13 +1,13 @@
 from behave import *
 
 @given(u'Een nieuwe reservering is aangemaakt')
-def step_impl(context):
-    raise NotImplementedError(u'STEP: Given Een nieuwe reservering is aangemaakt')
-
+def step_impl(context, db):
+    raise NotImplementedError('STEP: Given Een nieuwe reservering is aangemaakt')
+    dbConn.cursor()
     
 
 @when(u'Het systeem slaat de reservering op')
-def step_impl(context):
+def step_impl(context, ):
     raise NotImplementedError(u'STEP: When Het systeem slaat de reservering op')
 
 
