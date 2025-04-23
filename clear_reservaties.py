@@ -8,7 +8,7 @@ def clear_reservaties():
     cursor = conn.cursor()
 
     # Verwijder alles uit de reserveringen-tabel
-    cursor.execute("DELETE FROM reserveringen")
+    cursor.execute('''DELETE FROM reserveringen''')
     conn.commit()
 
     print("✅ Alle reservaties zijn verwijderd.")
