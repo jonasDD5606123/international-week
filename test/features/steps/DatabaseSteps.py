@@ -1,6 +1,7 @@
 from behave import *
 
 @given(u'Een nieuwe reservering is aangemaakt')
+<<<<<<< Updated upstream
 def step_impl(context, db):
     raise NotImplementedError('STEP: Given Een nieuwe reservering is aangemaakt')
     cursor = dbConn.cursor()
@@ -9,6 +10,14 @@ def step_impl(context, db):
 
 @when(u'Het systeem slaat de reservering op')
 def step_impl(context, ):
+=======
+def step_impl(context):
+    raise NotImplementedError('STEP: Given Een nieuwe reservering is aangemaakt')
+    
+
+@when(u'Het systeem slaat de reservering op')
+def step_impl(context):
+>>>>>>> Stashed changes
     raise NotImplementedError(u'STEP: When Het systeem slaat de reservering op')
 
 

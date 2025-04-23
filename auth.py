@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, logout_user
-from database import get_user_by_name
+from model.user import User
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -8,7 +8,7 @@ auth_bp = Blueprint('auth', __name__)
 def login():
     if request.method == 'POST':
         naam = request.form['naam']
-        user = get_user_by_name(naam)
+        user = User.by_name(naam)
         if user:
             login_user(user)
             return redirect(url_for('routes.index'))

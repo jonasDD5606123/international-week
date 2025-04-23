@@ -1,21 +1,20 @@
-import sqlite3
 from model.user import User
 
 DB_PATH = 'database.db'
-
-
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
+#Done
 def get_user_by_id(user_id):
     with get_connection() as conn:
         cur = conn.execute("SELECT * FROM Users WHERE ID = ?", (user_id,))
         row = cur.fetchone()
         return User(row['ID'], row['Naam'], row['Rol']) if row else None
 
+#Done
 def get_user_by_name(naam):
     with get_connection() as conn:
         cur = conn.execute("SELECT * FROM Users WHERE Naam = ?", (naam,))
@@ -77,7 +76,7 @@ def get_reserveringen_voor_gebruiker(user_id):
 
 def update_drone_status(drone_id, user_id):
     with get_connection() as conn:
-        conn.execute("UPDATE Drones SET Isbeschikbaar = 2, gereserveerd_voor = ? WHERE ID = ?",
+        conn.execute("UPDATE Drones SET Isbeschikbaar =  WHERE ID = ?",
                     (user_id, drone_id))
         conn.commit()
 
