@@ -4,6 +4,7 @@ from behave import *
 def step_impl(context):
     raise NotImplementedError(u'STEP: Given Een nieuwe reservering is aangemaakt')
 
+    
 
 @when(u'Het systeem slaat de reservering op')
 def step_impl(context):
