@@ -1,24 +1,19 @@
-import sqlite3
 from database_context import DatabaseContext
 
 class Verslag:
-    def __init__(self, id, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp):
+    def __init__(self, status, locatie, userId, reserveringId, timestamp, beeldmateriaal):
         self.id = id
         self.status = status
         self.locatie = locatie
-        self.user_id = user_id
-        self.reservering_id = reservering_id
-        self.beeldmateriaal = beeldmateriaal
+        self.userId = userId
+        self.reserveringId = reserveringId
         self.timestamp = timestamp
+        self.beeldmateriaal = beeldmateriaal
 
-    @staticmethod
-    def create(status, locatie, user_id, reservering_id, beeldmateriaal, timestamp):
-        conn = DatabaseContext().getDbConn()
+    def create(self):
+        sql = '''insert into verslagen (status, locatie, user_id, reservering_id, timestamp, beeldmateriaal) values (?, ?, ?, ?, ?, ?)'''
+        dc = DatabaseContext()
+        conn = dc.getDbConn()
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO verslagen (status, locatie, user_id, reservering_id, beeldmateriaal, timestamp) VALUES (?, ?, ?, ?, ?, ?)",
-            (status, locatie, user_id, reservering_id, beeldmateriaal, timestamp)
-        )
+        cursor.execute(sql, (self.status, self.locatie, self.userId, self.reserveringId, self.timestamp, self.beeldmateriaal))
         conn.commit()
-        id = cursor.lastrowid
-        return Verslag(id, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp)

@@ -27,7 +27,7 @@ def get_all_drones():
         cur = conn.execute("SELECT D.*, S.naam as locatie_naam FROM Drones D JOIN Startplaats S ON D.locatieId = S.ID")
         return [dict(row) for row in cur.fetchall()]
 
-def get_available_drones_per_location():
+def get_available_drones_per_location(user_id=None):
     with get_connection() as conn:
         result = []
         locaties = conn.execute("SELECT * FROM Startplaats").fetchall()
@@ -35,7 +35,11 @@ def get_available_drones_per_location():
         for loc in locaties:
             all_drones = conn.execute("SELECT * FROM Drones WHERE locatieId = ?", (loc['ID'],)).fetchall()
             available = [d for d in all_drones if d['Isbeschikbaar'] == 1]
-            reserved = [d for d in all_drones if d['Isbeschikbaar'] == 2]
+            if user_id:
+                reserved = [d for d in all_drones if d['Isbeschikbaar'] == 2 and d['gereserveerd_voor'] == user_id]
+            else:
+                reserved = [d for d in all_drones if d['Isbeschikbaar'] == 2]
+
             result.append({
                 "id": loc['ID'],
                 "naam": loc['naam'],
@@ -45,6 +49,7 @@ def get_available_drones_per_location():
                 "max_drones": loc['maxDrones']
             })
         return result
+
 
 def get_beschikbare_drones():
     with get_connection() as conn:

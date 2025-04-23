@@ -43,9 +43,12 @@ def initialize_database():
         startplaats_id INTEGER NOT NULL,
         user_id INTEGER NOT NULL,
         drones_id INTEGER NOT NULL,
+        verslag_id INTEGER DEFAULT NULL,
         FOREIGN KEY (startplaats_id) REFERENCES Startplaats(ID),
         FOREIGN KEY (user_id) REFERENCES Users(ID),
-        FOREIGN KEY (drones_id) REFERENCES Drones(ID)
+        FOREIGN KEY (drones_id) REFERENCES Drones(ID),
+        FOREIGN KEY (verslag_id) REFERENCES Verslagen(ID)
+
     );
 
     CREATE TABLE IF NOT EXISTS Verslagen (
