@@ -1,6 +1,5 @@
 from pytest_bdd import given, when, then
 
-
 @given(u'Een nieuwe reservering is aangemaakt')
 def step_impl(context):
     raise NotImplementedError(u'STEP: Given Een nieuwe reservering is aangemaakt')

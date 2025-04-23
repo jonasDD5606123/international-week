@@ -1,8 +1,9 @@
-import os
-from behave.__main__ import main as behave_main
+# TestRunner.py
+import subprocess
+
+def run_behave():
+    result = subprocess.run(["behave", "features/"], capture_output=True, text=True)
+    print(result.stdout)
 
 if __name__ == "__main__":
-    args = [
-        "Feature/",
-    ]
-    behave_main(args)
+    run_behave()
