@@ -1,7 +1,7 @@
 import sqlite3
 
 # Verander dit pad naar jouw eigen databasebestand
-DATABASE_PATH = 'instance/database.db'  # of waar jouw .db staat
+DATABASE_PATH = 'internationale_week.db'  # of waar jouw .db staat
 
 def clear_reservaties():
     conn = sqlite3.connect(DATABASE_PATH)
