@@ -1,4 +1,4 @@
-from pytest_bdd import given, when, then
+from behave import *
 
 @given(u'Een nieuwe reservering is aangemaakt')
 def step_impl(context):
