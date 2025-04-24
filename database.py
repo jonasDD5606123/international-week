@@ -1,3 +1,4 @@
+import sqlite3
 from model.user import User
 
 DB_PATH = 'database.db'
@@ -84,7 +85,6 @@ def update_drone_status(drone_id, user_id):
         conn.commit()
 
 
-import sqlite3
 
 def add_user(naam, rol):
     conn = sqlite3.connect("database.db")
