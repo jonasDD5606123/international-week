@@ -4,7 +4,7 @@ from model.reservering import Reservering
 
 @pytest.fixture
 def db_connection():
-    conn = DatabaseContext().getDbConn()
+    conn = DatabaseContext('test/test.db').getDbConn()
     assert conn is not None
     yield conn
     conn.close()
