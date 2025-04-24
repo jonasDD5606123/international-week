@@ -147,3 +147,16 @@ def locatie():
     locatie.create()
 
     return jsonify({'msg': 'location created', 'status': 201}), 201
+
+
+
+@routes_bp.route('/admin_verslag')
+@login_required
+def admin_verslag():
+    if current_user.rol != 'admin':
+        return redirect(url_for('index'))
+
+    # Haal alle verslagen op, inclusief de naam van de gebruiker
+    verslagen = Verslag.all()
+
+    return render_template('admin_verslag.html', verslagen=verslagen)

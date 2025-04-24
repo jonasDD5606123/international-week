@@ -5,6 +5,7 @@
 {% if current_user.rol == 'admin' %}
 <div class="admin-controls">
     <a href="{{ url_for('routes.admin_dashboard') }}" class="button admin-button">Admin Paneel</a>
+    <a href="{{ url_for('routes.admin_verslag') }}" class="button secondary">Bekijk Verslagen</a>
 </div>
 {% endif %}
 

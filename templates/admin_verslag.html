@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="verslagen-container">
+    <div class="verslagen-header">
+        <h1 class="verslagen-title">Verslagen Overzicht</h1>
+        <a href="{{ url_for('routes.index') }}" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            Terug naar Dashboard
+        </a>
+    </div>
+
+    {% if verslagen %}
+    <div class="verslagen-table-container">
+        <table class="verslagen-table">
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Locatie</th>
+                    <th>Beschrijving</th>
+                    <th>Status</th>
+                    <th>Gebruiker</th>
+                    <th>Beeldmateriaal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for verslag in verslagen %}
+                <tr>
+                    <td data-label="Datum">{{ verslag.timestamp }}</td>
+                    <td data-label="Locatie">{{ verslag.locatie }}</td>
+                    <td data-label="Beschrijving" class="beschrijving-cell">{{ verslag.beschrijving }}</td>
+                    <td data-label="Status">
+                        <span class="status-badge status-{{ verslag.status|lower|replace(' ', '-') }}">
+                            {{ verslag.status }}
+                        </span>
+                    </td>
+                    <td data-label="Gebruiker">{{ verslag.user_naam }}</td>
+                    <td data-label="Beeldmateriaal">
+                        {% if verslag.beeldmateriaal %}
+                        <div class="beeldmateriaal-container">
+                            <img src="{{ verslag.beeldmateriaal }}" alt="Beeldmateriaal" class="beeldmateriaal">
+                            <a href="{{ verslag.beeldmateriaal }}" target="_blank" class="beeldmateriaal-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                                </svg>
+                            </a>
+                        </div>
+                        {% else %}
+                        <span class="geen-beeldmateriaal">Geen beeldmateriaal</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="geen-verslagen">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#95a5a6" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+        </svg>
+        <p>Er zijn momenteel geen verslagen ingediend.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.verslagen-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.verslagen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.verslagen-title {
+    color: #2c3e50;
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.verslagen-table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.verslagen-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.verslagen-table th {
+    background-color: #3498db;
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+}
+
+.verslagen-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.verslagen-table tr:last-child td {
+    border-bottom: none;
+}
+
+.verslagen-table tr:hover td {
+    background-color: #f8f9fa;
+}
+
+.beschrijving-cell {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-failed {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.beeldmateriaal-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.beeldmateriaal {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.beeldmateriaal-link {
+    color: #3498db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.beeldmateriaal-link:hover {
+    background-color: #e3f2fd;
+}
+
+.geen-beeldmateriaal {
+    color: #95a5a6;
+    font-style: italic;
+}
+
+.geen-verslagen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    color: #95a5a6;
+    text-align: center;
+}
+
+.geen-verslagen p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .verslagen-table {
+        display: block;
+    }
+
+    .verslagen-table thead {
+        display: none;
+    }
+
+    .verslagen-table tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #eee;
+        border-radius: 6px;
+    }
+
+    .verslagen-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .verslagen-table td:last-child {
+        border-bottom: none;
+    }
+
+    .verslagen-table td::before {
+        content: attr(data-label);
+        font-weight: 500;
+        color: #7f8c8d;
+        margin-right: 1rem;
+    }
+
+    .beeldmateriaal-container {
+        justify-content: space-between;
+    }
+}
+</style>
+{% endblock %}
