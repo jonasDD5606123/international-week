@@ -71,6 +71,7 @@ def step_impl(context):
         drone_id=context.selected_drone.id,
         startplaats_id=context.selected_location.id
     )
+    reservering.create()
     context.reservation_result = reservering
 
     # Update drone status
@@ -92,12 +93,13 @@ def step_impl(context):
     # Verify the correct drone was reserved
     found_reservation = False
     for reservation in reservations:
-        if reservation['drones_id'] == context.selected_drone['ID']:
+        if reservation['drones_id'] == context.selected_drone.id:
             found_reservation = True
             break
     assert found_reservation, "Reservation for selected drone not found"
 
     # Verify drone status was updated
     available_drones_after = get_beschikbare_drones()
-    assert not any(drone['ID'] == context.selected_drone['ID']
+    print(available_drones_after)
+    assert not any(drone['ID'] == context.selected_drone.id
                    for drone in available_drones_after), "Drone should no longer be available"

@@ -81,7 +81,7 @@ def get_reserveringen_voor_gebruiker(user_id):
 
 def update_drone_status(drone_id, user_id):
     with get_connection() as conn:
-        conn.execute("UPDATE Drones SET Isbeschikbaar =  WHERE ID = ?",(user_id, drone_id))
+        conn.execute("UPDATE Drones SET Isbeschikbaar = ? WHERE ID = ?",(user_id, drone_id))
         conn.commit()
 
 
