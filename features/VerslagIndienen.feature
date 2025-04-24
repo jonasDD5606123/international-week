@@ -7,7 +7,7 @@ Feature: Verslaglegging na drone-inzet
     Then Het systeem koppelt het verslag aan de reservering en zet de drone terug op "beschikbaar"
 
   Scenario: Verslag zonder verplichte velden
-    Given Een ingelogde piloot met een actieve reservering
+    Given Een ingelogde piloot met een actieve reservering en een verslag
 
     When De piloot probeert een verslag in te dienen zonder "incidentinhoud"
 
