@@ -8,7 +8,6 @@ from model.verslag import Verslag
 
 routes_bp = Blueprint('routes', __name__)
 
-
 @routes_bp.route('/')
 @login_required
 def index():
@@ -23,7 +22,6 @@ def index():
 
     return render_template('index.html', locations=available_locations, drones=reserved_drones)
 
-
 @routes_bp.route('/admin')
 @login_required
 def admin_dashboard():
@@ -33,7 +31,6 @@ def admin_dashboard():
     # Haal de locaties op via Locatie.all() methode
     locaties = Locatie.all()
     return render_template('admin_dashboard.html', locaties=locaties)
-
 
 @routes_bp.route('/reserveer', methods=['GET', 'POST'])
 @login_required
@@ -65,7 +62,6 @@ def reserveer():
         selected_drone = Drone.by_id(drone_id)
 
     return render_template('reserveer.html', locations=available_locations, selected_location=selected_location, selected_drone=selected_drone)
-
 
 # Verslag indienen
 @routes_bp.route('/verslag', methods=['GET', 'POST'])

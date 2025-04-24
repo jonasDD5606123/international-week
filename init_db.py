@@ -67,13 +67,25 @@ def initialize_database():
 
     # Voeg testdata toe
     cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Admin", "admin"))
-    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 1", "piloot"))
+    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 1", "user"))
+    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 2", "user"))
+    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Manager", "user"))
+
     cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie A", 3))
     cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie B", 3))
-    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES ({100}, {1}, {1})')
+    cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie C", 3))
+
+    # Voeg drones toe aan verschillende locaties
+    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (100, 1, 1)')
+    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (80, 1, 1)')
+    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (90, 2, 1)')
+    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (70, 2, 1)')
+    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (60, 3, 1)')
+    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (50, 3, 1)')
 
     conn.commit()
     conn.close()
+
 
 if __name__ == '__main__':
     initialize_database()
