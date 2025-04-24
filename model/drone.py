@@ -44,6 +44,15 @@ class Drone:
         conn.commit()
 
     @staticmethod
+    def update_set_onbeschikbaar(drone_id):
+        sql = '''update drones set isbeschikbaar = 0 where id = ?'''
+        dc = DatabaseContext()
+        conn = dc.getDbConn()
+        cursor = conn.cursor()
+        cursor.execute(sql, (drone_id,))
+        conn.commit()
+
+    @staticmethod
     def all():
         sql = 'select id, batterijlevel, isbeschikbaar, locatieId from drones'
         dc = DatabaseContext()

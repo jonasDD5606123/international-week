@@ -25,7 +25,7 @@ def reserveer():
         reservering = Reservering(user_id=current_user.id, drone_id=drone_id, startplaats_id=startplaats_id)
         reservering.create()
 
-        Drone.update_set_beschikbaar(drone_id)
+        Drone.update_set_onbeschikbaar(drone_id)
 
         return redirect(url_for('routes.index'))
 

@@ -11,16 +11,12 @@ def db_connection():
 
 
 def test_create_reservering(db_connection):
-    # Prepare test data
     reservering = Reservering(user_id=1, drone_id=2, startplaats_id=3)
 
-    # Create a new reservering
     reservering.create()
 
-    # Fetch the created reservering directly from the database
     reservering1 = Reservering.by_id(reservering.id)
 
-    # Assert that the reservering is created and data matches
     assert reservering1 is not None
     assert reservering1.user_id == reservering.user_id  # user_id
     assert reservering1.drone_id == reservering.drone_id  # drone_id
