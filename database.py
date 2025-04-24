@@ -68,6 +68,10 @@ def create_verslag(status, locatie, user_id, reservering_id, beeldmateriaal, tim
         drone_id = conn.execute("SELECT drones_id FROM Reserveringen WHERE ID = ?", (reservering_id,)).fetchone()['drones_id']
         conn.execute("UPDATE Drones SET Isbeschikbaar = 1 WHERE ID = ?", (drone_id,))
         conn.commit()
+def get_verslagen_voor_gebruiker(user_id):
+    with get_connection() as conn:
+        cur = conn.execute("SELECT * FROM Verslagen WHERE user_id = ?",(user_id,))
+        return [dict(row) for row in cur.fetchall()]
 
 def get_reserveringen_voor_gebruiker(user_id):
     with get_connection() as conn:
@@ -76,8 +80,7 @@ def get_reserveringen_voor_gebruiker(user_id):
 
 def update_drone_status(drone_id, user_id):
     with get_connection() as conn:
-        conn.execute("UPDATE Drones SET Isbeschikbaar =  WHERE ID = ?",
-                    (user_id, drone_id))
+        conn.execute("UPDATE Drones SET Isbeschikbaar =  WHERE ID = ?",(user_id, drone_id))
         conn.commit()
 
 
