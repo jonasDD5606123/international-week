@@ -8,11 +8,31 @@ from model.verslag import Verslag
 
 routes_bp = Blueprint('routes', __name__)
 
+
 @routes_bp.route('/')
 @login_required
 def index():
+    # Laad alle locaties met beschikbare drones
     available_locations = Locatie.get_available_drones_per_location()
-    return render_template('index.html', locations=available_locations)
+
+    # Voor admin: toon ALLE gereserveerde drones
+    if current_user.rol == 'admin':
+        reserved_drones = Drone.all_reserved()
+    else:
+        reserved_drones = Drone.by_user(current_user.id)
+
+    return render_template('index.html', locations=available_locations, drones=reserved_drones)
+
+
+@routes_bp.route('/admin')
+@login_required
+def admin_dashboard():
+    if current_user.rol != 'admin':
+        return redirect(url_for('routes.index'))
+
+    # Haal de locaties op via Locatie.all() methode
+    locaties = Locatie.all()
+    return render_template('admin_dashboard.html', locaties=locaties)
 
 
 @routes_bp.route('/reserveer', methods=['GET', 'POST'])
@@ -25,7 +45,8 @@ def reserveer():
         reservering = Reservering(user_id=current_user.id, drone_id=drone_id, startplaats_id=startplaats_id)
         reservering.create()
 
-        Drone.update_set_beschikbaar(drone_id)
+        Drone.update_user_id(user_id=current_user.id, drone_id=drone_id)
+        Drone.update_set_onbeschikbaar(drone_id)
 
         return redirect(url_for('routes.index'))
 
@@ -55,12 +76,20 @@ def verslag():
         reservering_id = int(request.form['reservering_id'])
         status = request.form['status']
         locatie = request.form['locatie']
-        beeldmateriaal = request.form.get('beeldmateriaal', ''),
+        beeldmateriaal = request.form['beeldmateriaal']
+        bescrijving = request.form['beschrijving']
         #fix timestamp
 
         # Maak verslag aan
-        verslag = Verslag(status, locatie, current_user.id, reservering_id, beeldmateriaal, "2023-01-01 12:00:00")
+        verslag = Verslag(status, locatie, current_user.id, reservering_id, beeldmateriaal, "2023-01-01 12:00:00", bescrijving)
+        # verslag = Verslag(status=status, locatie=locatie, user_id=current_user.id, reservering_id=reservering_id, beeldmateriaal=beeldmateriaal, timestamp="2023-01-01 12:00:00", beschrijving=bescrijving)
         verslag.create()
+
+        reservering = Reservering.by_id(reservering_id)
+        Drone.update_user_id(reservering.drone_id, None)
+        Reservering.update_status(1, res_id=reservering.id)
+        Drone.update_set_beschikbaar(reservering.drone_id)
+
         return redirect(url_for('routes.index'))
 
     # get

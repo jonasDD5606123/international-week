@@ -31,7 +31,7 @@ class Reservering:
     @staticmethod
     def get_by_user(user_id):
         conn = DatabaseContext().getDbConn()
-        cursor = conn.execute("select user_id, drones_id, startplaats_id, id from reserveringen where user_id = ?", (user_id,))
+        cursor = conn.execute("select user_id, drones_id, startplaats_id, id from reserveringen where user_id = ? and is_afgerond = 0", (user_id,))
         rows = cursor.fetchall()
         reserveringen = []
         for row in rows:
@@ -48,3 +48,11 @@ class Reservering:
             "startplaats_id": self.startplaats_id,
             "verslag_id": self.verslag_id
         }
+
+    @staticmethod
+    def update_status(status, res_id):
+        conn = DatabaseContext().getDbConn()
+        sql = '''update reserveringen set is_afgerond = ? where id = ?'''
+        conn.execute(sql, (status, res_id))
+        conn.commit()
+        conn.close()
