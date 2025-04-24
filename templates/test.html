@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Drone Reservatie Systeem</h1>
+    <div class="button-group">
+        <a href="{{ url_for('routes.reserveer') }}" class="button">Nieuwe Reservatie</a>
+        <a href="{{ url_for('routes.verslag') }}" class="button secondary">Verslag Indienen</a>
+    </div>
+    <section class="location-section">
+        <h2>Beschikbare Drones</h2>
+        {% for location in locations %}
+        <div class="location-header">
+            <h3>{{ location.naam }}</h3>
+            <span class="status-available">{{ location.beschikbare_drones|length }} van 3 drones beschikbaar</span>
+        </div>
+
+        <div class="drone-grid">
+            {% for drone in location.drones %}
+                {% if drone.isbeschikbaar %}
+                <div class="drone-card" onclick="window.location.href='{{ url_for('routes.reserveer', location_id=location.id, drone_id=drone.id) }}'">
+                    <div class="drone-header">
+                        <h3>Drone #{{ drone.id }}</h3>
+                        <span class="drone-id">Locatie: {{ location.naam }}</span>
+                    </div>
+
+                    <div class="battery-level {% if drone.batterijlevel > 70 %}battery-high{% elif drone.batterijlevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                        <div class="battery-fill" style="width: {{ drone.batterijlevel }}%"></div>
+                    </div>
+
+                    <div>Batterij: {{ drone.batterijlevel }}%</div>
+
+                    <span class="status {% if drone.isbeschikbaar %}status-available{% else %}status-unavailable{% endif %}">
+                        {% if drone.isbeschikbaar %}Beschikbaar{% else %}In gebruik{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="reserved-drones-section">
+        <h2>Gereseveerde Drones</h2>
+        <div class="drone-grid">
+            {% for location in locations %}
+                {% for drone in location.drones %}
+                    {% if drone.gereserveerd_voor == current_user.id %}
+                    <div class="drone-card reserved">
+                        <div class="drone-header">
+                            <h3>Drone #{{ drone.id }}</h3>
+                            <span class="drone-id">Locatie: {{ location.naam }}</span>
+                        </div>
+
+                        <div class="battery-level {% if drone.batterijlevel > 70 %}battery-high{% elif drone.batterijlevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                            <div class="battery-fill" style="width: {{ drone.batterijlevel }}%"></div>
+                        </div>
+
+                        <div>Batterij: {{ drone.batterijlevel }}%</div>
+
+                        <span class="status reserved-status">
+                            Gereserveerd
+                        </span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </section>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Drone Reservatie Systeem</h1>
+
+    <section class="location-section">
+        <h2>Beschikbare Drones</h2>
+        {% for location in locations %}
+        <div class="location-header">
+            <h3>{{ location.naam }}</h3>
+            <span class="status-available">{{ location.beschikbare_drones|length }} van 3 drones beschikbaar</span>
+        </div>
+
+        <div class="drone-grid">
+            {% for drone in location.drones %}
+                {% if drone.isbeschikbaar %}
+                <div class="drone-card" onclick="window.location.href='{{ url_for('routes.reserveer', location_id=location.id, drone_id=drone.id) }}'">
+                    <div class="drone-header">
+                        <h3>Drone #{{ drone.id }}</h3>
+                        <span class="drone-id">Locatie: {{ location.naam }}</span>
+                    </div>
+
+                    <div class="battery-level {% if drone.batterijlevel > 70 %}battery-high{% elif drone.batterijlevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                        <div class="battery-fill" style="width: {{ drone.batterijlevel }}%"></div>
+                    </div>
+
+                    <div>Batterij: {{ drone.batterijlevel }}%</div>
+
+                    <span class="status {% if drone.isbeschikbaar %}status-available{% else %}status-unavailable{% endif %}">
+                        {% if drone.isbeschikbaar %}Beschikbaar{% else %}In gebruik{% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="reserved-drones-section">
+        <h2>Gereseveerde Drones</h2>
+        <div class="drone-grid">
+            {% for location in locations %}
+                {% for drone in location.drones %}
+                    {% if drone.gereserveerd_voor == current_user.id %}
+                    <div class="drone-card reserved">
+                        <div class="drone-header">
+                            <h3>Drone #{{ drone.id }}</h3>
+                            <span class="drone-id">Locatie: {{ location.naam }}</span>
+                        </div>
+
+                        <div class="battery-level {% if drone.batterijlevel > 70 %}battery-high{% elif drone.batterijlevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                            <div class="battery-fill" style="width: {{ drone.batterijlevel }}%"></div>
+                        </div>
+
+                        <div>Batterij: {{ drone.batterijlevel }}%</div>
+
+                        <span class="status reserved-status">
+                            Gereserveerd
+                        </span>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <div class="button-group">
+        <a href="{{ url_for('routes.reserveer') }}" class="button">Nieuwe Reservatie</a>
+        <a href="{{ url_for('routes.verslag') }}" class="button secondary">Verslag Indienen</a>
+    </div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+routes
+from flask import Blueprint, render_template, request, redirect, url_for
+from flask_login import login_required, current_user
+from database import (
+    get_available_drones_per_location,
+    create_reservering,
+    create_verslag,
+    get_reserveringen_voor_gebruiker,
+    update_drone_status
+)
+
+routes_bp = Blueprint('routes', __name__)
+
+# Homepagina die de beschikbare drones toont
+@routes_bp.route('/')
+@login_required
+def index():
+    # Verkrijg de locaties en drones die beschikbaar zijn per locatie
+    available_locations = get_available_drones_per_location()
+    return render_template('index.html', locations=available_locations)
+
+
+# Reserveren van een drone
+@routes_bp.route('/reserveer', methods=['GET', 'POST'])
+@login_required
+def reserveer():
+    if request.method == 'POST':
+        location_id = int(request.form['location_id'])  # De locatie die geselecteerd is
+        drone_id = int(request.form['drone_id'])  # De drone die geselecteerd is
+        startplaats_id = location_id  # De locatie wordt ook de startplaats
+
+        # Maak de reservering
+        create_reservering(current_user.id, drone_id, startplaats_id)
+
+        # Update de status van de drone naar gereserveerd
+        update_drone_status(drone_id, current_user.id)
+
+        # Redirect naar de homepagina
+        return redirect(url_for('routes.index'))
+
+    # Verkrijg de beschikbare drones per locatie
+    available_locations = get_available_drones_per_location()
+    return render_template('reserveer.html', locations=available_locations)
+
+
+# Verslag indienen
+@routes_bp.route('/verslag', methods=['GET', 'POST'])
+@login_required
+def verslag():
+    if request.method == 'POST':
+        reservering_id = int(request.form['reservering_id'])
+        status = request.form['status']
+        locatie = request.form['locatie']
+        beeldmateriaal = request.form.get('beeldmateriaal', '')
+
+        # Maak verslag aan
+        create_verslag(status, locatie, current_user.id, reservering_id, beeldmateriaal, "2023-01-01 12:00:00")
+        return redirect(url_for('routes.index'))
+
+    # Haal reserveringen op voor de huidige gebruiker
+    user_reserveringen = get_reserveringen_voor_gebruiker(current_user.id)
+    return render_template('verslag.html', reserveringen=user_reserveringen)
