@@ -55,12 +55,18 @@ def verslag():
         reservering_id = int(request.form['reservering_id'])
         status = request.form['status']
         locatie = request.form['locatie']
-        beeldmateriaal = request.form.get('beeldmateriaal', ''),
+        beeldmateriaal = request.form['beeldmateriaal']
+        bescrijving = request.form['beschrijving']
         #fix timestamp
 
         # Maak verslag aan
-        verslag = Verslag(status, locatie, current_user.id, reservering_id, beeldmateriaal, "2023-01-01 12:00:00")
+        verslag = Verslag(status, locatie, current_user.id, reservering_id, beeldmateriaal, "2023-01-01 12:00:00", bescrijving)
+        # verslag = Verslag(status=status, locatie=locatie, user_id=current_user.id, reservering_id=reservering_id, beeldmateriaal=beeldmateriaal, timestamp="2023-01-01 12:00:00", beschrijving=bescrijving)
         verslag.create()
+
+        reservering = Reservering.by_id(reservering_id)
+        Drone.update_set_beschikbaar(reservering.drone_id)
+
         return redirect(url_for('routes.index'))
 
     # get

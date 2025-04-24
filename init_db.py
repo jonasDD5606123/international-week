@@ -56,6 +56,7 @@ def initialize_database():
         reservering_id INTEGER NOT NULL,
         timestamp TEXT DEFAULT (datetime('now')),
         beeldmateriaal TEXT,
+        beschrijving TEXT not null,
         FOREIGN KEY (user_id) REFERENCES Users(ID),
         FOREIGN KEY (reservering_id) REFERENCES Reserveringen(ID)
     );
