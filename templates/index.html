@@ -2,36 +2,44 @@
 
 {% block content %}
     <h1>Drone Reservatie Systeem</h1>
+{% if current_user.rol == 'admin' %}
+<div class="admin-controls">
+    <a href="{{ url_for('routes.admin_dashboard') }}" class="button admin-button">Admin Paneel</a>
+</div>
+{% endif %}
+
     <div class="button-group">
         <a href="{{ url_for('routes.reserveer') }}" class="button">Nieuwe Reservatie</a>
         <a href="{{ url_for('routes.verslag') }}" class="button secondary">Verslag Indienen</a>
     </div>
 
-    {% if current_user %}
-    <section class="reserved-drones-section">
-        <h2>Gereserveerde Drones</h2>
-        <div class="drone-grid">
-            {% for drone in drones %}
-                <div class="drone-card reserved">
-                    <div class="drone-header">
-                        <h3>Drone #{{ drone.id }}</h3>
-                        <span class="drone-id">Locatie: -</span>
-                    </div>
-
-                    <div class="battery-level {% if drone.batterijLevel > 70 %}battery-high{% elif drone.batterijLevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
-                        <div class="battery-fill" style="width: {{ drone.batterijLevel }}%"></div>
-                    </div>
-
-                    <div>Batterij: {{ drone.batterijLevel }}%</div>
-
-                    <span class="status reserved-status">
-                        Gereserveerd
-                    </span>
+    {% if current_user.rol == 'admin' or current_user %}
+<section class="reserved-drones-section">
+    <h2>Alle Gereserveerde Drones</h2>
+    <div class="drone-grid">
+        {% for drone in drones %}
+            <div class="drone-card reserved">
+                <div class="drone-header">
+                    <h3>Drone #{{ drone.id }}</h3>
+                    <span class="drone-id">Locatie : -</span>
                 </div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
+
+                <div class="battery-level {% if drone.batterijLevel > 70 %}battery-high{% elif drone.batterijLevel > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                    <div class="battery-fill" style="width: {{ drone.batterijLevel }}%"></div>
+                </div>
+
+                <div>Batterij: {{ drone.batterijLevel }}%</div>
+
+{% if current_user.rol == 'admin' %}
+                        <div><strong>Gereserveerd door:</strong> {{ drone.gebruiker_naam }}</div>
+                    {% endif %}
+                <span class="status reserved-status">Gereserveerd</span>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
 
     {% for location in locations %}
     <section class="location-section">

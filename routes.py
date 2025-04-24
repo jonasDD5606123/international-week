@@ -12,14 +12,27 @@ routes_bp = Blueprint('routes', __name__)
 @routes_bp.route('/')
 @login_required
 def index():
-    # Fetch available drones per location and the drones reserved by the current user
+    # Laad alle locaties met beschikbare drones
     available_locations = Locatie.get_available_drones_per_location()
-    reserved_drones = Drone.by_user(current_user.id)
 
-
-    # This should return drones reserved by the current user
+    # Voor admin: toon ALLE gereserveerde drones
+    if current_user.rol == 'admin':
+        reserved_drones = Drone.all_reserved()
+    else:
+        reserved_drones = Drone.by_user(current_user.id)
 
     return render_template('index.html', locations=available_locations, drones=reserved_drones)
+
+
+@routes_bp.route('/admin')
+@login_required
+def admin_dashboard():
+    if current_user.rol != 'admin':
+        return redirect(url_for('routes.index'))
+
+    # Haal de locaties op via Locatie.all() methode
+    locaties = Locatie.all()
+    return render_template('admin_dashboard.html', locaties=locaties)
 
 
 @routes_bp.route('/reserveer', methods=['GET', 'POST'])

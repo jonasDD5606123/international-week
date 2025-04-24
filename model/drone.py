@@ -114,3 +114,32 @@ class Drone:
             "batterijlevel": self.batterijLevel,
             "locatieId": self.locatieId
         }
+
+    @staticmethod
+    def all_reserved():
+        sql = '''
+                SELECT d.id, d.batterijlevel, d.isbeschikbaar, d.locatieId, d.user_id, u.naam
+                FROM drones d
+                JOIN users u ON d.user_id = u.id
+                WHERE d.isbeschikbaar = 0
+            '''
+        dc = DatabaseContext()
+        conn = dc.getDbConn()
+        cursor = conn.execute(sql)
+        rows = cursor.fetchall()
+        conn.commit()
+        conn.close()
+
+        drones = []
+        for row in rows:
+            drone = Drone(
+                beschikbaarheid=row[2],
+                batterijLevel=row[1],
+                locatieId=row[3],
+                user_id=row[4],
+                id=row[0]
+            )
+            drone.gebruiker_naam = row[5]  # Voeg gebruikersnaam toe (uit kolom 'naam')
+            drones.append(drone)
+
+        return drones

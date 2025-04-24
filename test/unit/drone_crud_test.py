@@ -1,17 +1,20 @@
 import pytest
 from database_context import DatabaseContext
 from model.drone import Drone  # adjust import if needed
+from model.locatie import Locatie
 
 @pytest.fixture(autouse=True)
-def db_connection_test():
+def db_connection():
     # Before each test
-    conn = DatabaseContext().getDbConn()
-    cursor = conn.cursor()
+    conn = DatabaseContext(path='test/test.db').getDbConn()
     conn.commit()
     yield
     conn.close()
 
 def test_drone_creation_and_fetch():
+    loc = Locatie('Test-Locatie-1', maxDrones=20)
+    loc.create()
+
     drone = Drone(beschikbaarheid=1, batterijLevel=95, locatieId=101)
     #create drone
     drone.create()
