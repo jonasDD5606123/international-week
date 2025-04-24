@@ -1,11 +1,11 @@
 from behave import *
 
-@given(u'Een ingelogde piloot met een actieve reservering')
+@given(u'Een ingelogde piloot met een actieve reservering en een verslag')
 def step_impl(context):
     raise NotImplementedError(u'STEP: Given Een ingelogde piloot met een actieve reservering')
 
 
-@when(u'De piloot vult het verslagformulier in (met observaties en optionele afbeelding) en dient het in')
+@when(u'De piloot vult het verslagformulier in en dient het in')
 def step_impl(context):
     raise NotImplementedError(u'STEP: When De piloot vult het verslagformulier in (met observaties en optionele afbeelding) en dient het in')
 
