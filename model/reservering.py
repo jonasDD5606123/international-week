@@ -31,7 +31,7 @@ class Reservering:
     @staticmethod
     def get_by_user(user_id):
         conn = DatabaseContext().getDbConn()
-        cursor = conn.execute("select user_id, drones_id, startplaats_id, id from reserveringen where user_id = ?", (user_id,))
+        cursor = conn.execute("select user_id, drones_id, startplaats_id, id from reserveringen where user_id = ? and is_afgerond = 0", (user_id,))
         rows = cursor.fetchall()
         reserveringen = []
         for row in rows:
