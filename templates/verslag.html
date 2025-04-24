@@ -17,7 +17,7 @@
                     <option value="" disabled selected>Selecteer een reservering</option>
                     {% for res in reserveringen %}
                         <option value="{{ res.id }}">
-                            Reservering #{{ res.id }} - Drone {{ res.drones_id }} (Locatie: {{ res.startplaats_id }})
+                            Reservering {{ res.id }} - Drone {{ res.drone_id }} (Locatie: {{ res.startplaats_id }})
                         </option>
                     {% endfor %}
                 </select>

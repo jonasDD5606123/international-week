@@ -3,18 +3,24 @@
 {% block content %}
     <h1>Drone reserveren</h1>
     <form method="POST">
-        <h2>Selecteer een locatie:</h2>
-        <select name="location_id" id="location-select" required>
-            <option value="" disabled {% if not selected_location %}selected{% endif %}>Kies een locatie</option>
-            {% for location in locations %}
-                <option value="{{ location.id }}" {% if location.id == selected_location.id %}selected{% endif %}>{{ location.naam }}</option>
-            {% endfor %}
-        </select>
+        <h2>Locatie:</h2>
+        {% if selected_location %}
+            <p>{{ selected_location.naam }}</p>
+            <input type="hidden" name="location_id" value="{{ selected_location.id }}">
+        {% else %}
+            <select name="location_id" id="location-select" required>
+                <option value="" disabled selected>Kies een locatie</option>
+                {% for location in locations %}
+                    <option value="{{ location.id }}">{{ location.naam }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+
 
         <div id="drone-selection">
             <h3>Beschikbare drone:</h3>
             {% if selected_drone %}
-                <p>Drone #{{ selected_drone.id }} (Batterij: {{ selected_drone.batterijlevel }}%)</p>
+                <p>Drone #{{ selected_drone.id }} (Batterij: {{ selected_drone.batterijLevel }}%)</p>
                 <input type="hidden" name="drone_id" value="{{ selected_drone.id }}">
             {% else %}
                 <!-- Dynamisch de drones tonen op basis van de geselecteerde locatie -->
@@ -24,7 +30,8 @@
 
         <button type="submit">Reserveer</button>
     </form>
-<script>
+
+    <script>
         // Dynamisch de drones tonen op basis van de geselecteerde locatie
         document.getElementById('location-select').addEventListener('change', function() {
             var locationId = this.value;
@@ -32,11 +39,11 @@
             dronesContainer.innerHTML = '';  // Reset de drones sectie
 
             // Zoek de drones die overeenkomen met de geselecteerde locatie
-            var location = {{ locations|tojson }};
-            var dronesForLocation = location.find(loc => loc.id == locationId).beschikbare_drones;
+            var locationsData = {{ locations|tojson }};
+            var selectedLocation = locationsData.find(loc => loc.id == locationId);
 
-            if (dronesForLocation.length > 0) {
-                dronesForLocation.forEach(function(drone) {
+            if (selectedLocation && selectedLocation.beschikbare_drones.length > 0) {
+                selectedLocation.beschikbare_drones.forEach(function(drone) {
                     var droneElement = document.createElement('div');
                     droneElement.innerHTML = `
                         <input type="radio" name="drone_id" value="${drone.id}" required>

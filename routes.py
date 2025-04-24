@@ -8,11 +8,18 @@ from model.verslag import Verslag
 
 routes_bp = Blueprint('routes', __name__)
 
+
 @routes_bp.route('/')
 @login_required
 def index():
+    # Fetch available drones per location and the drones reserved by the current user
     available_locations = Locatie.get_available_drones_per_location()
-    return render_template('index.html', locations=available_locations)
+    reserved_drones = Drone.by_user(current_user.id)
+
+
+    # This should return drones reserved by the current user
+
+    return render_template('index.html', locations=available_locations, drones=reserved_drones)
 
 
 @routes_bp.route('/reserveer', methods=['GET', 'POST'])
@@ -25,6 +32,7 @@ def reserveer():
         reservering = Reservering(user_id=current_user.id, drone_id=drone_id, startplaats_id=startplaats_id)
         reservering.create()
 
+        Drone.update_user_id(user_id=current_user.id, drone_id=drone_id)
         Drone.update_set_onbeschikbaar(drone_id)
 
         return redirect(url_for('routes.index'))
@@ -65,6 +73,8 @@ def verslag():
         verslag.create()
 
         reservering = Reservering.by_id(reservering_id)
+        Drone.update_user_id(reservering.drone_id, None)
+        Reservering.update_status(1, res_id=reservering.id)
         Drone.update_set_beschikbaar(reservering.drone_id)
 
         return redirect(url_for('routes.index'))

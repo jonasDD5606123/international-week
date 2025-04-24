@@ -48,3 +48,11 @@ class Reservering:
             "startplaats_id": self.startplaats_id,
             "verslag_id": self.verslag_id
         }
+
+    @staticmethod
+    def update_status(status, res_id):
+        conn = DatabaseContext().getDbConn()
+        sql = '''update reserveringen set is_afgerond = ? where id = ?'''
+        conn.execute(sql, (status, res_id))
+        conn.commit()
+        conn.close()

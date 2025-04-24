@@ -1,7 +1,7 @@
 from database_context import DatabaseContext
 
 class Verslag:
-    def __init__(self, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp, beschrijving, id = None):
+    def __init__(self, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp, beschrijving,   id = None):
         self.id = id
         self.status = status
         self.locatie = locatie
@@ -22,3 +22,4 @@ class Verslag:
         conn.commit()
         self.id = cursor.lastrowid
         conn.close()
+
