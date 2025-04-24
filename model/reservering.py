@@ -20,6 +20,15 @@ class Reservering:
         conn.close()
 
     @staticmethod
+    def by_id(res_id):
+        dc = DatabaseContext()
+        conn = dc.getDbConn()
+        cursor = conn.execute('select user_id, drones_id, startplaats_id, id from reserveringen where id = ?', (res_id,))
+        row = cursor.fetchone()
+        reservering = Reservering(user_id=row[0], drone_id=row[1], startplaats_id=row[2], id=row[3])
+        return reservering
+
+    @staticmethod
     def get_by_user(user_id):
         conn = DatabaseContext().getDbConn()
         cursor = conn.execute("select user_id, drones_id, startplaats_id, id from reserveringen where user_id = ?", (user_id,))

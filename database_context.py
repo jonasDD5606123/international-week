@@ -1,11 +1,10 @@
 #project/model/database-context.py
 
 import sqlite3
-from config import Config
 
 class DatabaseContext:
     def __init__(self):
-        self._conn = sqlite3.connect(Config.DB_PATH)
+        self._conn = sqlite3.connect('database.db')
 
     def getDbConn(self):
         return self._conn

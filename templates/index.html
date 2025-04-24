@@ -1,14 +1,66 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Citymesh Dashboard</title>
-</head>
-<body>
-  <h1>Drones</h1>
-  <ul>
-    {% for drone in drones %}
-      <li>{{ drone }}</li>
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Drone Reservatie Systeem</h1>
+    <div class="button-group">
+        <a href="{{ url_for('routes.reserveer') }}" class="button">Nieuwe Reservatie</a>
+        <a href="{{ url_for('routes.verslag') }}" class="button secondary">Verslag Indienen</a>
+    </div>
+
+    {% if current_user %}
+    <section class="reserved-drones-section">
+        <h2>Gereserveerde Drones</h2>
+        <div class="drone-grid">
+            {% for location in locations %}
+                {% for drone in location.gereserveerde_drones %}
+                    <div class="drone-card reserved">
+                        <div class="drone-header">
+                            <h3>Drone #{{ drone.id }}</h3>
+                            <span class="drone-id">Locatie: {{ location.naam }}</span>
+                        </div>
+
+                        <div class="battery-level {% if drone['batterijlevel'] > 70 %}battery-high{% elif drone['batterijlevel'] > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                            <div class="battery-fill" style="width: {{ drone['batterijlevel'] }}%"></div>
+                        </div>
+
+                        <div>Batterij: {{ drone['batterijlevel'] }}%</div>
+
+                        <span class="status reserved-status">
+                            Gereserveerd
+                        </span>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% for location in locations %}
+    <section class="location-section">
+        <h2>{{ location.naam }}
+            <span class="status-available">{{ location.beschikbare_drones|length }} van {{ location.max_drones }} drones beschikbaar</span>
+        </h2>
+
+        <div class="drone-grid">
+            {% for drone in location.beschikbare_drones %}
+                <div class="drone-card" onclick="window.location.href='{{ url_for('routes.reserveer', location_id=location.id, drone_id=drone['ID']) }}'">
+                    <div class="drone-header">
+                        <h3>Drone #{{ drone.id }}</h3>
+                        <span class="drone-id">Locatie: {{ location.naam }}</span>
+                    </div>
+
+                    <div class="battery-level {% if drone['batterijlevel'] > 70 %}battery-high{% elif drone['batterijlevel'] > 30 %}battery-medium{% else %}battery-low{% endif %}">
+                        <div class="battery-fill" style="width: {{ drone['batterijlevel'] }}%"></div>
+                    </div>
+
+                    <div>Batterij: {{ drone['batterijlevel'] }}%</div>
+
+                    <span class="status status-available">
+                        Beschikbaar
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
     {% endfor %}
-  </ul>
-</body>
-</html>
+{% endblock %}
