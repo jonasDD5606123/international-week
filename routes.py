@@ -35,8 +35,13 @@ def reserveer():
     available_locations = Locatie.get_available_drones_per_location()
 
     # Zoek de specifieke locatie en drone
-    selected_location = Locatie.by_id(location_id)
-    selected_drone = Drone.by_id(drone_id)
+    selected_location = None
+    selected_drone = None
+
+    if location_id is not None:
+        selected_location = Locatie.by_id(location_id)
+    if drone_id is not None:
+        selected_drone = Drone.by_id(drone_id)
 
     return render_template('reserveer.html', locations=available_locations, selected_location=selected_location, selected_drone=selected_drone)
 

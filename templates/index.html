@@ -15,7 +15,7 @@
                 {% for drone in location.gereserveerde_drones %}
                     <div class="drone-card reserved">
                         <div class="drone-header">
-                            <h3>Drone #{{ drone['ID'] }}</h3>
+                            <h3>Drone #{{ drone.id }}</h3>
                             <span class="drone-id">Locatie: {{ location.naam }}</span>
                         </div>
 
@@ -45,7 +45,7 @@
             {% for drone in location.beschikbare_drones %}
                 <div class="drone-card" onclick="window.location.href='{{ url_for('routes.reserveer', location_id=location.id, drone_id=drone['ID']) }}'">
                     <div class="drone-header">
-                        <h3>Drone #{{ drone['ID'] }}</h3>
+                        <h3>Drone #{{ drone.id }}</h3>
                         <span class="drone-id">Locatie: {{ location.naam }}</span>
                     </div>
 

@@ -40,20 +40,20 @@ class Locatie:
         return locaties
 
     @staticmethod
-    def by_id(id):
+    def by_id(loc_id):
         dc = DatabaseContext()
         conn = dc.getDbConn()
-        sql = '''select * from startplaats where id = ?'''
-        cursor = conn.execute(sql)
+        sql = '''select naam, maxDrones, id from startplaats where id = ?'''
+        cursor = conn.execute(sql, (loc_id,))
         row = cursor.fetchone()
-        locatie = Locatie(row['naam'], row['maxDrones'], row['id'])
+        locatie = Locatie(naam=row[0], maxDrones=row[1], id=row[2])
         return locatie
 
     def get_drone_count(self):
         dc = DatabaseContext()
         conn = dc.getDbConn()
-        sql = 'select count(*) from drones where locatieId'
-        cursor = conn.execute(sql)
+        sql = 'select count(*) from drones where locatieId = ?'
+        cursor = conn.execute(sql, (self.id,))
         row = cursor.fetchone()
         return row[0]
 
@@ -63,6 +63,7 @@ class Locatie:
         locaties = Locatie.all()
         drones = Drone.all()
 
+        # Group drones by location ID
         drones_by_loc = {}
         for d in drones:
             loc_id = d.locatieId
@@ -70,18 +71,19 @@ class Locatie:
                 drones_by_loc[loc_id] = []
             drones_by_loc[loc_id].append(d)
 
-            for loc in locaties:
-                all_drones = drones_by_loc.get(loc.id, [])
-                available = [d for d in all_drones if d.beschikbaarheid == 1]
-                reserved = [d for d in all_drones if d.beschikbaarheid == 0]
+        # Now process each location once
+        for loc in locaties:
+            all_drones = drones_by_loc.get(loc.id, [])
+            available = [d for d in all_drones if d.beschikbaarheid == 1]
+            reserved = [d for d in all_drones if d.beschikbaarheid == 0]
 
-                result.append({
-                    "id": loc.id,
-                    "naam": loc.naam,
-                    "drones": [d.to_dict() for d in all_drones],
-                    "beschikbare_drones": [d.to_dict() for d in available],
-                    "gereserveerde_drones": [d.to_dict() for d in reserved],
-                    "max_drones": loc.maxDrones
-                })
+            result.append({
+                "id": loc.id,
+                "naam": loc.naam,
+                "drones": [d.to_dict() for d in all_drones],
+                "beschikbare_drones": [d.to_dict() for d in available],
+                "gereserveerde_drones": [d.to_dict() for d in reserved],
+                "max_drones": loc.maxDrones
+            })
 
         return result
