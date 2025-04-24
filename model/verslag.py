@@ -1,8 +1,7 @@
-import sqlite3
 from database_context import DatabaseContext
 
 class Verslag:
-    def __init__(self, id, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp):
+    def __init__(self, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp, id = None):
         self.id = id
         self.status = status
         self.locatie = locatie
@@ -11,14 +10,13 @@ class Verslag:
         self.beeldmateriaal = beeldmateriaal
         self.timestamp = timestamp
 
-    @staticmethod
-    def create(status, locatie, user_id, reservering_id, beeldmateriaal, timestamp):
+    def create(self):
         conn = DatabaseContext().getDbConn()
         cursor = conn.cursor()
+        sql = '''insert into verslagen (status, locatie, user_id, reservering_id, beeldmateriaal, timestamp) values (?, ?, ?, ?, ?, ?)'''
         cursor.execute(
-            "INSERT INTO verslagen (status, locatie, user_id, reservering_id, beeldmateriaal, timestamp) VALUES (?, ?, ?, ?, ?, ?)",
-            (status, locatie, user_id, reservering_id, beeldmateriaal, timestamp)
+            sql, (self.status, self.locatie, self.user_id, self.reservering_id, self.beeldmateriaal, self.timestamp)
         )
         conn.commit()
-        id = cursor.lastrowid
-        return Verslag(id, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp)
+        self.id = cursor.lastrowid
+        conn.close()

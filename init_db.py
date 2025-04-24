@@ -66,6 +66,7 @@ def initialize_database():
     cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 1", "piloot"))
     cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie A", 3))
     cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie B", 3))
+    cursor.execute(f'insert into drones (batterijlevel, locatieid, isbeschikbaar) values ({100}, {1}, {1})')
 
     conn.commit()
     conn.close()
