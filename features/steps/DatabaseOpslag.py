@@ -72,7 +72,8 @@ def step_impl(context):
         user_id=context.pilot.id,
         reservering_id=context.reservering.id,
         beeldmateriaal=context.verslag_data['beeldmateriaal'],
-        timestamp=context.verslag_data['timestamp']
+        timestamp=context.verslag_data['timestamp'],
+        beschrijving="wazzzaaaap"
     )
     context.verslag.create()
 
