@@ -12,7 +12,7 @@ from database import (
 @given(u'Een nieuwe reservering is aangemaakt')
 def step_impl(context):
     # Create a pilot user
-    context.pilot = User(naam="test_pilot_reservatie", rol=1)
+    context.pilot = User(naam="test-piloot", rol=1)
     context.pilot.create()
 
     # Create test reservation data
@@ -60,7 +60,8 @@ def step_impl(context):
         'status': 'voltooid',
         'locatie': 'Test locatie',
         'beeldmateriaal': 'test.jpg',
-        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'beschrijving': "Dit is een test"
     }
 
 @when(u'Het systeem slaat het verslag op')
@@ -73,7 +74,7 @@ def step_impl(context):
         reservering_id=context.reservering.id,
         beeldmateriaal=context.verslag_data['beeldmateriaal'],
         timestamp=context.verslag_data['timestamp'],
-        beschrijving="wazzzaaaap"
+        beschrijving=context.verslag_data["beschrijving"]
     )
     context.verslag.create()
 
