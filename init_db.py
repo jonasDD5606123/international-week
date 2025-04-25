@@ -63,7 +63,7 @@ def initialize_database(dc):
         beschrijving TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES Users(ID),
         FOREIGN KEY (reservering_id) REFERENCES Reserveringen(ID)
-    );
+    );  
     """)
 
     # Create trigger to check if max drones are reached before inserting a new drone
