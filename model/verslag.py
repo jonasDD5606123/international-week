@@ -1,7 +1,7 @@
 from database_context import DatabaseContext
 
 class Verslag:
-    def __init__(self, status, locatie, user_id, reservering_id, beeldmateriaal, timestamp, beschrijving, user_naam=None, id=None):
+    def __init__(self, status=None, locatie=None, user_id=None, reservering_id=None, beeldmateriaal=None, timestamp=None, beschrijving=None, user_naam=None, id=None):
         self.id = id
         self.status = status
         self.locatie = locatie
@@ -15,9 +15,9 @@ class Verslag:
     def create(self):
         conn = DatabaseContext().getDbConn()
         cursor = conn.cursor()
-        sql = '''insert into verslagen (status, locatie, user_id, reservering_id, beeldmateriaal, timestamp, beschrijving) values (?, ?, ?, ?, ?, ?, ?)'''
+        sql = '''insert into verslagen (status, locatie, user_id, reservering_id, beeldmateriaal, beschrijving) values (?, ?, ?, ?, ?, ?)'''
         cursor.execute(
-            sql, (self.status, self.locatie, self.user_id, self.reservering_id, self.beeldmateriaal, self.timestamp, self.beschrijving)
+            sql, (self.status, self.locatie, self.user_id, self.reservering_id, self.beeldmateriaal, self.beschrijving)
         )
         conn.commit()
         self.id = cursor.lastrowid
@@ -53,3 +53,34 @@ class Verslag:
             verslagen.append(verslag)
 
         return verslagen
+
+    @staticmethod
+    def by_id(verslag_id):
+        # Haal verslag op op basis van verslag_id
+        sql = '''
+            SELECT v.id, v.status, v.locatie, v.user_id, v.reservering_id, v.beeldmateriaal, v.timestamp, v.beschrijving, u.naam
+            FROM verslagen v
+            JOIN users u ON v.user_id = u.id
+            WHERE v.id = ?
+        '''
+        dc = DatabaseContext()
+        conn = dc.getDbConn()
+        cursor = conn.execute(sql, (verslag_id,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            verslag = Verslag(
+                status=row[1],
+                locatie=row[2],
+                user_id=row[3],
+                reservering_id=row[4],
+                beeldmateriaal=row[5],
+                timestamp=row[6],
+                beschrijving=row[7],
+                user_naam=row[8],  # De naam van de gebruiker
+                id=row[0]
+            )
+            return verslag
+        else:
+            return None  # Geen verslag gevonden voor het opgegeven id

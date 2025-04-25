@@ -1,7 +1,8 @@
 import sqlite3
+from database_context import DatabaseContext
 
-def initialize_database():
-    conn = sqlite3.connect('database.db')
+def initialize_database(dc):
+    conn = dc.getDbConn()
     cursor = conn.cursor()
 
     # Zet foreign key enforcement aan
@@ -20,7 +21,7 @@ def initialize_database():
     cursor.executescript("""
     CREATE TABLE IF NOT EXISTS Users (
         ID INTEGER PRIMARY KEY,
-        Naam TEXT NOT NULL,
+        naam TEXT NOT NULL UNIQUE,
         Rol TEXT NOT NULL
     );
 
@@ -57,7 +58,7 @@ def initialize_database():
         locatie TEXT,
         user_id INTEGER NOT NULL,
         reservering_id INTEGER NOT NULL,
-        timestamp TEXT DEFAULT (datetime('now')),
+        timestamp timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         beeldmateriaal TEXT,
         beschrijving TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES Users(ID),
@@ -65,27 +66,60 @@ def initialize_database():
     );
     """)
 
-    # Voeg testdata toe
-    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Admin", "admin"))
-    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 1", "user"))
-    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 2", "user"))
-    cursor.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Manager", "user"))
-
-    cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie A", 3))
-    cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie B", 3))
-    cursor.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie C", 3))
-
-    # Voeg drones toe aan verschillende locaties
-    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (100, 1, 1)')
-    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (80, 1, 1)')
-    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (90, 2, 1)')
-    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (70, 2, 1)')
-    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (60, 3, 1)')
-    cursor.execute(f'INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (50, 3, 1)')
-
+    # Create trigger to check if max drones are reached before inserting a new drone
+    cursor.execute("""
+    CREATE TRIGGER IF NOT EXISTS check_max_drones
+    BEFORE INSERT ON Drones
+    FOR EACH ROW
+    BEGIN
+        -- Check if adding the new drone will exceed maxDrones for the location
+        SELECT CASE
+            WHEN (SELECT COUNT(*) FROM Drones WHERE locatieId = NEW.locatieId) >= (SELECT maxDrones FROM Startplaats WHERE ID = NEW.locatieId)
+            THEN RAISE (ABORT, 'Maximum number of drones reached for this location.')
+        END;
+    END;
+    """)
     conn.commit()
-    conn.close()
+
+# Voeg drones toe aan verschillende locaties
+def add_drone(batterijlevel, locatieId, dc):
+    conn = dc.getDbConn()
+    cursor = conn.cursor()
+    try:
+        cursor.execute('INSERT INTO Drones (batterijlevel, locatieId, Isbeschikbaar) VALUES (?, ?, ?)',
+                       (batterijlevel, locatieId, 1))
+        conn.commit()  # Commit the changes to the database
+        print(f"Drone toegevoegd op locatie {locatieId}.")
+    except sqlite3.DatabaseError as e:
+        print(f"Fout bij toevoegen drone: {e}")
 
 
 if __name__ == '__main__':
-    initialize_database()
+    # First context (e.g., 'database.db')
+    dc1 = DatabaseContext(path='database.db')
+    conn1 = dc1.getDbConn()
+    initialize_database(dc1)
+    # Voeg testdata toe
+    conn1.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Admin", "admin"))
+    conn1.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 1", "user"))
+    conn1.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Piloot 2", "user"))
+    conn1.execute("INSERT INTO Users (Naam, Rol) VALUES (?, ?)", ("Manager", "user"))
+
+    conn1.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie A", 3))
+    conn1.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie B", 3))
+    conn1.execute("INSERT INTO Startplaats (naam, maxDrones) VALUES (?, ?)", ("Locatie C", 3))
+
+    add_drone(100, 1, dc1)
+    add_drone(100, 1, dc1)
+    add_drone(80, 1, dc1)
+    add_drone(90, 1, dc1)  # This will exceed the maxDrones for Locatie A
+    add_drone(70, 2, dc1)
+    add_drone(60, 2, dc1)
+    add_drone(50, 3, dc1)
+
+    conn1.commit()
+    conn1.close()
+    # Second context (e.g., 'test/test.db')
+    dc2 = DatabaseContext(path='test/test.db')
+    initialize_database(dc2)
+    dc2.getDbConn().close()

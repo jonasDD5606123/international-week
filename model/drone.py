@@ -1,5 +1,6 @@
 from database_context import DatabaseContext
 
+
 class Drone:
     def __init__(self, beschikbaarheid=None, batterijLevel=None, locatieId=None,user_id=None, id=None):
         self.id = id
@@ -12,7 +13,8 @@ class Drone:
         dc = DatabaseContext()
         conn = dc.getDbConn()
         cursor = conn.cursor()
-        sql = '''insert into drones (batterijlevel, isbeschikbaar, locatieId, user_id) values (?, ?, ?, ?)'''
+        sql = '''insert into drones (batterijlevel, isbeschikbaar, locatieId, user_id) \
+                     values (?, ?, ?, ?)'''
         cursor.execute(sql, (self.batterijLevel, self.beschikbaarheid, self.locatieId, self.user_id))
         conn.commit()
         self.id = cursor.lastrowid
